@@ -6,7 +6,7 @@ import "datatables.net-dt/js/dataTables.dataTables";
 import "datatables.net-dt/css/dataTables.dataTables.min.css";
 
 const Tablecategorias = () => {
-  const apiUrl = "https://ferreone.ultimatetics.com.mx/api/";
+  const apiUrl = "http://adminfer.test/api/categorias";
   const { dataAPI, error } = useApi(apiUrl);
   const [mostrarModal, setMostrarModal] = useState(false);
   const tableRef = useRef<HTMLTableElement>(null);

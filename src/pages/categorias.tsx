@@ -1,5 +1,5 @@
 import React from "react";
-import Tablecategorias from "../components/Categories/Index";
+import Tablecategorias from "../components/Categories";
 
 const Categorias: React.FC = () => {
   return (
