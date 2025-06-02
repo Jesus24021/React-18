@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
 const Sidebar: React.FC = () => {
   return (
@@ -10,46 +11,46 @@ const Sidebar: React.FC = () => {
         <div className="sb-sidenav-menu">
           <div className="nav">
             <div className="sb-sidenav-menu-heading">Inicio</div>
-            <a className="nav-link" href="#">
+            <Link className="nav-link" to="#">
               <div className="sb-nav-link-icon">
                 <i className="fas fa-tachometer-alt"></i>
               </div>
               Panel
-            </a>
+            </Link>
 
             <div className="sb-sidenav-menu-heading">Administración</div>
-            <a className="nav-link" href="/usuarios">
+            <Link className="nav-link" to="/usuarios">
               <div className="sb-nav-link-icon">
                 <i className="fas fa-users"></i>
               </div>
               Usuarios
-            </a>
+            </Link>
 
             <div className="sb-sidenav-menu-heading">Módulos</div>
-            <a className="nav-link" href="/categorias">
+            <Link className="nav-link" to="/categorias">
               <div className="sb-nav-link-icon">
                 <i className="fas fa-tags"></i>
               </div>
               Categorías
-            </a>
-            <a className="nav-link" href="/marcas">
+            </Link>
+            <Link className="nav-link" to="/marcas">
               <div className="sb-nav-link-icon">
                 <i className="fas fa-bullhorn"></i>
               </div>
               Marcas
-            </a>
-            <a className="nav-link" href="/productos">
+            </Link>
+            <Link className="nav-link" to="/productos">
               <div className="sb-nav-link-icon">
                 <i className="fas fa-cart-shopping"></i>
               </div>
               Productos
-            </a>
-            <a className="nav-link" href="/tablas">
+            </Link>
+            <Link className="nav-link" to="/tablas">
               <div className="sb-nav-link-icon">
                 <i className="fas fa-table"></i>
               </div>
               Tablas
-            </a>
+            </Link>
           </div>
         </div>
         <div className="sb-sidenav-footer">

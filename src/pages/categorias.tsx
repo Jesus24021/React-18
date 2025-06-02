@@ -1,14 +1,13 @@
 import React from "react";
-import CategoriasContent from "../components/Categorias";
+import Tablecategorias from "../components/Categories/Index";
 
-const Usuarios: React.FC = () => {
+const Categorias: React.FC = () => {
   return (
     <div className="container-fluid px-4">
-      <h1 className="mt-4">Categorias</h1>
-
-      <TCategoriasContent />
+      <h1 className="mt-4 text-center">Categorías</h1>
+      <Tablecategorias />
     </div>
   );
 };
 
-export default Usuarios;
+export default Categorias;

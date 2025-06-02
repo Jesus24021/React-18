@@ -6,23 +6,25 @@ import Footer from "./components/Footer";
 
 import Usuarios from "./pages/usuarios";
 import Productos from "./pages/productos";
+import Categorias from "./pages/categorias";
 
 function App() {
   return (
     <Router>
+      
       <div className="sb-nav-fixed">
-        
-        <Navbar /> 
+        <Navbar />
         <div id="layoutSidenav">
-          <Sidebar /> 
+          <Sidebar />
           <div id="layoutSidenav_content">
             <main>
               <Routes>
                 <Route path="/usuarios" element={<Usuarios />} />
                 <Route path="/productos" element={<Productos />} />
+                <Route path="/categorias" element={<Categorias />} />
               </Routes>
             </main>
-            <Footer /> 
+            <Footer />
           </div>
         </div>
       </div>

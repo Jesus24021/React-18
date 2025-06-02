@@ -5,8 +5,8 @@ import Swal from "sweetalert2";
 import "datatables.net-dt/js/dataTables.dataTables";
 import "datatables.net-dt/css/dataTables.dataTables.min.css";
 
-const Tablesusers = () => {
-  const apiUrl = "https://ferreone.ultimatetics.com.mx/api/usuario";
+const Tablecategorias = () => {
+  const apiUrl = "https://ferreone.ultimatetics.com.mx/api/";
   const { dataAPI, error } = useApi(apiUrl);
   const [mostrarModal, setMostrarModal] = useState(false);
   const tableRef = useRef<HTMLTableElement>(null);
@@ -20,26 +20,25 @@ const Tablesusers = () => {
     }
   }, [dataAPI]);
 
-  const [usuarioNuevo, setUsuarioNuevo] = useState({
-    nombre_completo: "",
-    nombre_usuario: "",
-    correo_electronico: "",
-    contrasennia: "",
+  const [categoriaNuevo, setCategoriaNuevo] = useState({
+    id: "",
+    nombre: "",
+    descripcion: "",
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setUsuarioNuevo({ ...usuarioNuevo, [name]: value });
+    setCategoriaNuevo({ ...categoriaNuevo, [name]: value });
   };
 
-  const guardarUsuario = async () => {
+  const guardarCategoria = async () => {
     try {
       const respuesta = await fetch(apiUrl, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(usuarioNuevo),
+        body: JSON.stringify(categoriaNuevo),
       });
 
       const resultado = await respuesta.json();
@@ -47,21 +46,21 @@ const Tablesusers = () => {
       if (!respuesta.ok) {
         console.error("Error de validación:", resultado);
         alert(
-          " No se pudo registrar el producto.\n" +
+          " No se pudo registrar la categoria.\n" +
             JSON.stringify(resultado.errors || resultado)
         );
         return;
       }
-      alert("Usuario registrado correctamente");
+      alert("Categoria registrada correctamente");
       setMostrarModal(false);
       window.location.reload();
     } catch (error) {
       console.error("Error en la petición:", error);
-      alert(" Error al registrar el usuario");
+      alert(" Error al registrar la categoria");
     }
   };
 
-  const eliminarUsuario = async (id: string) => {
+  const eliminarCategoria = async (id: string) => {
     const confirmacion = await Swal.fire({
       title: "¿Estás seguro?",
       text: "Esta acción no se puede deshacer",
@@ -70,18 +69,20 @@ const Tablesusers = () => {
       confirmButtonText: "Sí, eliminar",
       cancelButtonText: "Cancelar",
     });
+
     if (confirmacion.isConfirmed) {
       try {
         const respuesta = await fetch(`${apiUrl}/${id}`, {
           method: "DELETE",
         });
+
         if (!respuesta.ok) {
-          throw new Error("No se pudo eliminar el usuario");
+          throw new Error("No se pudo eliminar la categoria");
         }
 
         Swal.fire({
           title: "¡Eliminado!",
-          text: "El usuario fue eliminado.",
+          text: "La categoria fue eliminado.",
           icon: "success",
           timer: 5000,
           timerProgressBar: true,
@@ -90,8 +91,12 @@ const Tablesusers = () => {
           window.location.reload();
         });
       } catch (error) {
-        console.error("Error al eliminar el usuario:", error);
-        Swal.fire("Error", "Hubo un problema al eliminar el usuario", "error");
+        console.error("Error al eliminar la categoria:", error);
+        Swal.fire(
+          "Error",
+          "Hubo un problema al eliminar la categoria",
+          "error"
+        );
       }
     }
   };
@@ -103,7 +108,7 @@ const Tablesusers = () => {
           className="btn btn-success"
           onClick={() => setMostrarModal(true)}
         >
-          Agregar usuario
+          Agregar categoria
         </button>
       </div>
 
@@ -118,52 +123,40 @@ const Tablesusers = () => {
           >
             <thead>
               <tr>
-                <th>Nombre Completo</th>
-                <th>Nombre de Usuario</th>
-                <th>Correo Electrónico</th>
-                <th>Estado</th>
+                <th>Nombre</th>
+                <th>Descripción</th>
+                <td>Estado</td>
                 <th className="text-center">Acciones</th>
               </tr>
             </thead>
             <tbody>
-              {dataAPI.map((usuario, index) => {
-                return (
-                  <tr key={usuario.id || index}>
-                    <td>{usuario.nombre_completo}</td>
-                    <td>{usuario.nombre_usuario}</td>
-                    <td>{usuario.correo_electronico}</td>
-                    <td>
-                      <span
-                        className={`badge ${
-                          usuario.activo ? "bg-success" : "bg-danger"
-                        }`}
-                      >
-                        {usuario.activo ? "Activo" : "Inactivo"}
-                      </span>
-                    </td>
-                    <td className="text-nowrap text-center">
-                      <button className="btn btn-primary btn-sm me-2">
-                        <i className="bi bi-pencil-square"></i> Actualizar
-                      </button>
-                      <button
-                        className="btn btn-danger btn-sm"
-                        onClick={() => eliminarUsuario(usuario.id)}
-                      >
-                        <i className="bi bi-trash"></i> Eliminar
-                      </button>
-                    </td>
-                  </tr>
-                );
-              })}
+              {dataAPI.map((producto, index) => (
+                <tr key={producto.id || index}>
+                  <td>{producto.nombre}</td>
+                  <td>{producto.descripcion}</td>
+                  <td>{producto.estado}</td>
+                  <td className="text-nowrap text-center">
+                    <button className="btn btn-primary btn-sm me-2">
+                      <i className="bi bi-pencil-square"></i> Actualizar
+                    </button>
+                    <button
+                      className="btn btn-danger btn-sm"
+                      onClick={() => eliminarCategoria(producto.id)}
+                    >
+                      <i className="bi bi-trash"></i> Eliminar
+                    </button>
+                  </td>
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>
       ) : (
         <div className="text-center py-5">
-          <div className="spinner-border text-primary" role="status">
+          <div className="spinner-border text-success" role="status">
             <span className="visually-hidden">Cargando...</span>
           </div>
-          <p className="mt-2 text-muted">Cargando datos...</p>
+          <p className="mt-2 text-muted">Cargando productos...</p>
         </div>
       )}
 
@@ -176,7 +169,7 @@ const Tablesusers = () => {
             >
               <div className="modal-content">
                 <div className="modal-header">
-                  <h5 className="modal-title">Registrar usuario</h5>
+                  <h5 className="modal-title">Agregar Categoria</h5>
                   <button
                     type="button"
                     className="btn-close"
@@ -187,42 +180,22 @@ const Tablesusers = () => {
                   <form>
                     <div className="row g-3">
                       <div className="col-md-6">
-                        <label className="form-label">Nombre Completo</label>
+                        <label className="form-label">Nombre</label>
                         <input
                           type="text"
                           className="form-control"
-                          name="clave_p"
-                          value={usuarioNuevo.nombre_completo}
-                          onChange={handleChange}
-                        />
-                      </div>
-                      <div className="col-md-6">
-                        <label className="form-label">Nombre de Usuario</label>
-                        <input
-                          type="text"
-                          className="form-control"
-                          name="nombre_p"
-                          value={usuarioNuevo.nombre_usuario}
+                          name="nombre"
+                          value={categoriaNuevo.nombre}
                           onChange={handleChange}
                         />
                       </div>
                       <div className="col-12">
-                        <label className="form-label">Correo Electronico</label>
+                        <label className="form-label">Descripción</label>
                         <input
                           type="text"
                           className="form-control"
-                          name="descripcion_p"
-                          value={usuarioNuevo.correo_electronico}
-                          onChange={handleChange}
-                        />
-                      </div>
-                      <div className="col-md-4">
-                        <label className="form-label">Contraseña</label>
-                        <input
-                          type="password"
-                          className="form-control"
-                          name="categoria_id"
-                          value={usuarioNuevo.contrasennia}
+                          name="descripcion"
+                          value={categoriaNuevo.descripcion}
                           onChange={handleChange}
                         />
                       </div>
@@ -240,9 +213,9 @@ const Tablesusers = () => {
                   <button
                     type="button"
                     className="btn btn-success"
-                    onClick={guardarUsuario}
+                    onClick={guardarCategoria}
                   >
-                    Guardar usuario
+                    Guardar categoria
                   </button>
                 </div>
               </div>
@@ -254,4 +227,5 @@ const Tablesusers = () => {
     </div>
   );
 };
-export default Tablesusers;
+
+export default Tablecategorias;
