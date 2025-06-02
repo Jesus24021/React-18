@@ -23,6 +23,8 @@ function AppRoutes() {
                     <Routes>
                       <Route path="/usuarios" element={<Usuarios />} />
                       <Route path="/productos" element={<Productos />} />
+
+                      <Route path="/categoria" element={<Categorias />} />
                     </Routes>
                   </main>
                   <Footer />
