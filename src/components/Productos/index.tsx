@@ -6,9 +6,11 @@ import "datatables.net-dt/js/dataTables.dataTables";
 import "datatables.net-dt/css/dataTables.dataTables.min.css";
 
 const TablaProductos = () => {
-  const apiUrl = "https://ferreone.ultimatetics.com.mx/api/producto";
+  const apiUrl = "http://adminfer.test/api/producto";
   const { dataAPI, error } = useApi(apiUrl);
   const [mostrarModal, setMostrarModal] = useState(false);
+  const [modoEdicion, setModoEdicion] = useState(false);
+  const [productoEditarId, setProductoEditarId] = useState<string | null>(null);
   const tableRef = useRef<HTMLTableElement>(null);
 
   useEffect(() => {
@@ -37,6 +39,30 @@ const TablaProductos = () => {
     setProductoNuevo({ ...productoNuevo, [name]: value });
   };
 
+  const abrirModalAgregar = () => {
+    setProductoNuevo({
+      clave_p: "",
+      nombre_p: "",
+      descripcion_p: "",
+      categoria_id: "",
+      precioc_p: "",
+      preciov_p: "",
+      unidadM_p: "",
+      stock_p: "",
+      fingreso_p: "",
+    });
+    setProductoEditarId(null);
+    setModoEdicion(false);
+    setMostrarModal(true);
+  };
+
+  const abrirModalEditar = (producto) => {
+    setProductoNuevo({ ...producto });
+    setProductoEditarId(producto.id);
+    setModoEdicion(true);
+    setMostrarModal(true);
+  };
+
   const guardarProducto = async () => {
     try {
       const respuesta = await fetch(apiUrl, {
@@ -50,19 +76,50 @@ const TablaProductos = () => {
       const resultado = await respuesta.json();
 
       if (!respuesta.ok) {
-        console.error("Error de validación:", resultado);
         alert(
-          " No se pudo registrar el producto.\n" +
+          "No se pudo registrar el producto.\n" +
             JSON.stringify(resultado.errors || resultado)
         );
         return;
       }
-      alert("Producto registrado correctamente");
+      await Swal.fire("Éxito", "Producto registrado correctamente", "success");
       setMostrarModal(false);
       window.location.reload();
     } catch (error) {
-      console.error("Error en la petición:", error);
-      alert(" Error al registrar el producto");
+      console.error("Error al guardar producto:", error);
+      alert("Error al registrar el producto");
+    }
+  };
+
+  const actualizarProducto = async () => {
+    try {
+      const respuesta = await fetch(`${apiUrl}/${productoEditarId}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(productoNuevo),
+      });
+
+      const resultado = await respuesta.json();
+
+      if (!respuesta.ok) {
+        alert(
+          "No se pudo actualizar el producto.\n" +
+            JSON.stringify(resultado.errors || resultado)
+        );
+        return;
+      }
+      await Swal.fire(
+        "Actualizado",
+        "Producto actualizado correctamente",
+        "success"
+      );
+      setMostrarModal(false);
+      window.location.reload();
+    } catch (error) {
+      console.error("Error al actualizar producto:", error);
+      alert("Error al actualizar el producto");
     }
   };
 
@@ -86,19 +143,15 @@ const TablaProductos = () => {
           throw new Error("No se pudo eliminar el producto");
         }
 
-        Swal.fire({
-          title: "¡Eliminado!",
-          text: "El producto fue eliminado.",
-          icon: "success",
-          timer: 5000, 
-          timerProgressBar: true,
-          showConfirmButton: false,
-        }).then(() => {
-          window.location.reload();
-        });
+        await Swal.fire(
+          "Eliminado",
+          "Producto eliminado correctamente",
+          "success"
+        );
+        window.location.reload();
       } catch (error) {
-        console.error("Error al eliminar el producto:", error);
-        Swal.fire("Error", "Hubo un problema al eliminar el producto", "error");
+        console.error("Error al eliminar producto:", error);
+        Swal.fire("Error", "No se pudo eliminar el producto", "error");
       }
     }
   };
@@ -106,10 +159,7 @@ const TablaProductos = () => {
   return (
     <div className="container mt-4 p-4 bg-white rounded-3 shadow-sm">
       <div className="d-flex justify-content-start align-items-center mb-3 gap-3">
-        <button
-          className="btn btn-success"
-          onClick={() => setMostrarModal(true)}
-        >
+        <button className="btn btn-success" onClick={abrirModalAgregar}>
           Agregar producto
         </button>
       </div>
@@ -129,8 +179,8 @@ const TablaProductos = () => {
                 <th>Nombre</th>
                 <th>Descripción</th>
                 <th>Categoría</th>
-                <th>Precio de Compra</th>
-                <th>Precio de Venta</th>
+                <th>Precio Compra</th>
+                <th>Precio Venta</th>
                 <th>Unidad</th>
                 <th>Stock</th>
                 <th>Ingreso</th>
@@ -139,7 +189,7 @@ const TablaProductos = () => {
             </thead>
             <tbody>
               {dataAPI.map((producto, index) => (
-                <tr key={producto.clave_p || index}>
+                <tr key={producto.id || index}>
                   <td>{producto.clave_p}</td>
                   <td>{producto.nombre_p}</td>
                   <td>{producto.descripcion_p}</td>
@@ -150,7 +200,10 @@ const TablaProductos = () => {
                   <td>{producto.stock_p}</td>
                   <td>{producto.fingreso_p}</td>
                   <td className="text-nowrap text-center">
-                    <button className="btn btn-primary btn-sm me-2">
+                    <button
+                      className="btn btn-primary btn-sm me-2"
+                      onClick={() => abrirModalEditar(producto)}
+                    >
                       <i className="bi bi-pencil-square"></i> Actualizar
                     </button>
                     <button
@@ -176,14 +229,13 @@ const TablaProductos = () => {
 
       {mostrarModal && (
         <>
-          <div className="modal d-block" tabIndex={-1} role="dialog">
-            <div
-              className="modal-dialog modal-lg modal-dialog-scrollable"
-              role="document"
-            >
+          <div className="modal d-block" tabIndex={-1}>
+            <div className="modal-dialog modal-lg modal-dialog-scrollable">
               <div className="modal-content">
                 <div className="modal-header">
-                  <h5 className="modal-title">Agregar producto</h5>
+                  <h5 className="modal-title">
+                    {modoEdicion ? "Actualizar producto" : "Agregar producto"}
+                  </h5>
                   <button
                     type="button"
                     className="btn-close"
@@ -193,96 +245,40 @@ const TablaProductos = () => {
                 <div className="modal-body">
                   <form>
                     <div className="row g-3">
-                      <div className="col-md-6">
-                        <label className="form-label">Clave</label>
-                        <input
-                          type="text"
-                          className="form-control"
-                          name="clave_p"
-                          value={productoNuevo.clave_p}
-                          onChange={handleChange}
-                        />
-                      </div>
-                      <div className="col-md-6">
-                        <label className="form-label">Nombre</label>
-                        <input
-                          type="text"
-                          className="form-control"
-                          name="nombre_p"
-                          value={productoNuevo.nombre_p}
-                          onChange={handleChange}
-                        />
-                      </div>
-                      <div className="col-12">
-                        <label className="form-label">Descripción</label>
-                        <input
-                          type="text"
-                          className="form-control"
-                          name="descripcion_p"
-                          value={productoNuevo.descripcion_p}
-                          onChange={handleChange}
-                        />
-                      </div>
-                      <div className="col-md-4">
-                        <label className="form-label">Categoría</label>
-                        <input
-                          type="text"
-                          className="form-control"
-                          name="categoria_id"
-                          value={productoNuevo.categoria_id}
-                          onChange={handleChange}
-                        />
-                      </div>
-                      <div className="col-md-4">
-                        <label className="form-label">Precio de Compra</label>
-                        <input
-                          type="number"
-                          className="form-control"
-                          name="precioc_p"
-                          value={productoNuevo.precioc_p}
-                          onChange={handleChange}
-                        />
-                      </div>
-                      <div className="col-md-4">
-                        <label className="form-label">Precio de Venta</label>
-                        <input
-                          type="number"
-                          className="form-control"
-                          name="preciov_p"
-                          value={productoNuevo.preciov_p}
-                          onChange={handleChange}
-                        />
-                      </div>
-                      <div className="col-md-4">
-                        <label className="form-label">Unidad</label>
-                        <input
-                          type="text"
-                          className="form-control"
-                          name="unidadM_p"
-                          value={productoNuevo.unidadM_p}
-                          onChange={handleChange}
-                        />
-                      </div>
-                      <div className="col-md-4">
-                        <label className="form-label">Stock</label>
-                        <input
-                          type="number"
-                          className="form-control"
-                          name="stock_p"
-                          value={productoNuevo.stock_p}
-                          onChange={handleChange}
-                        />
-                      </div>
-                      <div className="col-md-4">
-                        <label className="form-label">Fecha de ingreso</label>
-                        <input
-                          type="date"
-                          className="form-control"
-                          name="fingreso_p"
-                          value={productoNuevo.fingreso_p}
-                          onChange={handleChange}
-                        />
-                      </div>
+                      {[
+                        { label: "Clave", name: "clave_p" },
+                        { label: "Nombre", name: "nombre_p" },
+                        { label: "Descripción", name: "descripcion_p" },
+                        { label: "Categoría", name: "categoria_id" },
+                        {
+                          label: "Precio Compra",
+                          name: "precioc_p",
+                          type: "number",
+                        },
+                        {
+                          label: "Precio Venta",
+                          name: "preciov_p",
+                          type: "number",
+                        },
+                        { label: "Unidad", name: "unidadM_p" },
+                        { label: "Stock", name: "stock_p", type: "number" },
+                        {
+                          label: "Fecha de ingreso",
+                          name: "fingreso_p",
+                          type: "date",
+                        },
+                      ].map(({ label, name, type = "text" }, i) => (
+                        <div className={`col-md-${i < 3 ? 6 : 4}`} key={name}>
+                          <label className="form-label">{label}</label>
+                          <input
+                            type={type}
+                            className="form-control"
+                            name={name}
+                            value={(productoNuevo as any)[name]}
+                            onChange={handleChange}
+                          />
+                        </div>
+                      ))}
                     </div>
                   </form>
                 </div>
@@ -297,9 +293,9 @@ const TablaProductos = () => {
                   <button
                     type="button"
                     className="btn btn-success"
-                    onClick={guardarProducto}
+                    onClick={modoEdicion ? actualizarProducto : guardarProducto}
                   >
-                    Guardar producto
+                    {modoEdicion ? "Actualizar" : "Guardar"}
                   </button>
                 </div>
               </div>

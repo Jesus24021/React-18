@@ -6,6 +6,7 @@ import Login from "../pages/Auth/login";
 import Header from "../components/Navbar";
 import Footer from "../components/Sidebar";
 import Menu from "../components/Footer";
+import { ListaProductos } from "../components/ListaProductos";
 
 function AppRoutes() {
   return (
@@ -28,6 +29,7 @@ function AppRoutes() {
                       <Route path="/usuarios" element={<Usuarios />} />
                       <Route path="/productos" element={<Productos />} />
                       <Route path="/categorias" element={<Categorias />} />
+                      <Route path="/Lista" element={<ListaProductos />} />
                     </Routes>
                   </main>
                   <Footer />

@@ -33,11 +33,11 @@ const Sidebar: React.FC = () => {
               </div>
               Categorías
             </Link>
-            <Link className="nav-link" to="/marcas">
+            <Link className="nav-link" to="/Lista">
               <div className="sb-nav-link-icon">
                 <i className="fas fa-bullhorn"></i>
               </div>
-              Marcas
+              ListaProductos
             </Link>
             <Link className="nav-link" to="/productos">
               <div className="sb-nav-link-icon">
